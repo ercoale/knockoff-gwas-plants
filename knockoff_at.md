@@ -1,3 +1,3 @@
-## Background Information: What is knockoff gwas?
+## Background Information: what is knockoff gwas?
 ## Generating Knockoffs
 ##
