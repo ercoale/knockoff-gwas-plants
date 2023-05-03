@@ -20,6 +20,17 @@ Linkage disequilibrium (LD) is the result of strong local dependence between SNP
 
 Samples lack independence (individuals share some degree of relatedness), inducing long-range LD across the entire genome. This can lead to flase associations, especially if the sample size is large--even weak associations can appear to be statistically significant. 
 
-# GWAS Pipeline
+## GWAS Pipeline
 
+The standard approach is to identify promising signals for the association of a phenotype with one variant at a time via a linear model. Population structure is corrected for with aditional covariates, such as top principal compenents of the genotype matrix. P values are the threshold to control for the familywise error rate (FWER), or the probability of at least 1 false positive when multiple comparisons are being tested, such as Bonferroni corretion and Tukey HSD test.Variants associated with the phenotype and highly correlated with one another are clustered into distinct groups to avoid redundancy. 
+
+The results of the univariate tests are then used as input for fine mapping and polygenic risk scores. Fine mapping identifies causal variants among similarly associated SNPs in LD, and polygenic risk scores are predictors of a trait for future samples based on a large number of genetic variants across the genome (I assume this means how many times you predict to find your trait?). This method, however, does not guarantee control over type-I errors, and results are difficult to interpret and actual causal variants nowhere to be found. 
+
+# KnockoffGWAS
+
+## Knockoffs
+
+Knockoffs are randomly generated negative control variables that are indistinguishable from the original null variables (not directly associated with the phenotype). Because they are interchangeable, we can find variants that actually influence the phenotype because their association with the phenotype will be significantly stronger than those of their knockoffs. A knockoff filter is an algorithm that computes the knockoff-based significance threshold, which controls FDR--this filter can be applied to any association statistics. For the knockoff filter, a a model for the distribution of the original variables is needed.
+
+## Knockoff Methodology
 
