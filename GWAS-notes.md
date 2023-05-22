@@ -18,13 +18,13 @@ Linkage disequilibrium (LD) is the result of strong local dependence between SNP
 
 ## Population Structure
 
-Samples lack independence (individuals share some degree of relatedness), inducing long-range LD across the entire genome. This can lead to flase associations, especially if the sample size is large--even weak associations can appear to be statistically significant. 
+Samples lack independence (individuals share some degree of relatedness), inducing long-range LD across the entire genome. This can lead to flase associations, especially if the sample size is large--even weak associations can appear to be statistically significant.
 
 ## GWAS Pipeline
 
-The standard approach is to identify promising signals for the association of a phenotype with one variant at a time via a linear model. Population structure is corrected for with aditional covariates, such as top principal compenents of the genotype matrix. P values are the threshold to control for the familywise error rate (FWER), or the probability of at least 1 false positive when multiple comparisons are being tested, such as Bonferroni corretion and Tukey HSD test.Variants associated with the phenotype and highly correlated with one another are clustered into distinct groups to avoid redundancy. 
+The standard approach is to identify promising signals for the association of a phenotype with one variant at a time via a linear model. Population structure is corrected for with aditional covariates, such as top principal compenents of the genotype matrix. P values are the threshold to control for the familywise error rate (FWER), or the probability of at least 1 false positive when multiple comparisons are being tested, such as Bonferroni corretion and Tukey HSD test.Variants associated with the phenotype and highly correlated with one another are clustered into distinct groups to avoid redundancy.
 
-The results of the univariate tests are then used as input for fine mapping and polygenic risk scores. Fine mapping identifies causal variants among similarly associated SNPs in LD, and polygenic risk scores are predictors of a trait for future samples based on a large number of genetic variants across the genome (I assume this means how many times you predict to find your trait?). This method, however, does not guarantee control over type-I errors, and results are difficult to interpret and actual causal variants nowhere to be found. 
+The results of the univariate tests are then used as input for fine mapping and polygenic risk scores. Fine mapping identifies causal variants among similarly associated SNPs in LD, and polygenic risk scores are predictors of a trait for future samples based on a large number of genetic variants across the genome (I assume this means how many times you predict to find your trait?). This method, however, does not guarantee control over type-I errors, and results are difficult to interpret and actual causal variants hard to find.
 
 # KnockoffGWAS
 
@@ -34,3 +34,40 @@ Knockoffs are randomly generated negative control variables that are indistingui
 
 ## Knockoff Methodology
 
+###Notation, Problem Statement, Assumptions
+
+We want to find variants or groups of variants that contain distinct associations with our phenotype. We want to know if the conditional distribution of our phenotype (Y) given our genotypic information (X) is dependent on a variant of X or a fixed group of variants. In this paper, they focused on one genotype partition assumed to be fixed and all SNPs physically contiguous.
+
+Null hypothesis: can only be true if genotypic information provides no further information about the phenotype beyond what can be gathered from the rest of the genome. This equation essentially allows for the discovery of interesting biological effects rather than any association.
+
+This model is Fisherian in that it attempts to measure the amount of information that an observable random variable X carries about an unknown parametere of a distribution that models X. They do not posit a linear model because they do not know if it is realistic. Phenotypes in different families are assumed to be conditionally independent of one another given genotypes, but those in the same family might be affected by shared environmental factors. Generally, they focus on genotypes with well-understood inheritance mechanisms; the distribution of all genotypes within the same family are described with hidden Markov models (HMMs) that take into account patterns of relatedness and idividual ancestry that have been observed. These HMMs are also assumed to be conditionally independent across different families given reconstructed ancestries of all individuals which are leveraged to create knockoffs, or our negative controls.
+
+### Exchangeable Negative Controls
+
+A random matrix X\~ is a knockoff of X, the genotype, if it satisfies two properties: x\~ provides no additional information about Y, the phenotype (always true since X\~ is made looking at X, not Y), and the join distribution of X and X\~ must be invariant upon swapping genotypes with their corresponding knockoffs for all individuals in any family. In other words, if we see an unordered pair of genotypes and genotype knockoffs, we have no way of knowing which are the originals and which are the knockoffs. The only difference is when we look at the symmetry between these knockoffs and the originals conditional on Y.
+
+Knockoffs cannot necessarily have the same distribution as originals, but rather they have to preserve short and long-range LD that are consistent in ancestries and family structures. PCA performed on both genotypes and their knockoffs should produce similar results by design.
+
+(add more HMM stuff in here when you've watched Ian's HMM lecture)
+
+### The Knockoff Filter
+
+The only way to tell knockoffs and genotypes apart is to look at the phenotype, statistically speaking.
+
+# Discussion
+
+**KnockoffGWAS constructs negative control genomes that preserve pre-existing population structure, familiar relatedness, and linkage disequilibrium while allowing for greater control over false discovery rate (FDR).**
+
+Compared to the traditional GWAS pipeline, it is possible to locate causal variants without further fine mapping, etc. Typically GWAS data that comes from different populations are combined in later meta analyses to preserve population structure, but KOGWAS removes the need for this kind of splitting. **Power is increased because LD patterns uncover causal variants better.** Phenotypic variation in minority populations may also benefit from this pipeline.
+
+Including individuals with diverse ancestries makes for more interesting research opportunities! We can investigate which discoveries are consistently found in different populations (better weed out false positives), and look for rare variants.
+
+# Algorithms
+
+## Algorithm 1: Choosing the HMM reference haplotypes ![](algo1_KOGWAS.PNG)
+
+## Algorithm 2: Knockoffs preserving population structure
+![](algo2_KOGWAS.PNG)
+
+## Algorithm 3: Knockoffs presering population structure and relatedness
+![](algo3_KOGWAS.PNG)
